@@ -1,0 +1,558 @@
+{
+  "name": "Converte Audio, imagem e texto para flowise",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "convertAllData": false,
+        "sourceKey": "body.data.message.base64",
+        "options": {
+          "dataIsBase64": true,
+          "encoding": "utf8",
+          "fileName": "teste.ogg",
+          "mimeType": "application/ogg"
+        }
+      },
+      "id": "9f8511de-3122-4543-8183-ba807914b54a",
+      "name": "Converte Audio",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        860,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "jsonToBinary",
+        "convertAllData": false,
+        "sourceKey": "body.data.message.base64",
+        "destinationKey": "data2",
+        "options": {
+          "dataIsBase64": true,
+          "mimeType": "image/png"
+        }
+      },
+      "id": "60ed6e24-ead5-4480-9675-a43212fb5906",
+      "name": "Converte Imagem",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        860,
+        540
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://flowise.trecofantastico.com.br/api/v1/prediction/7c7bec4e-4fcf-4843-af5f-10c7ce19f6ad",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"question\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"message\"][\"extendedTextMessage\"][\"text\"].replace(/[^a-zA-Z0-9 ]/g, '').replace(/\\s+/g, ' ').trim() }}. Responda em português.\",\n  \"overrideConfig\": {\n    \"sessionId\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "8681bf2f-37b0-4728-bd04-48d0c0f2a157",
+      "name": "Envia ao Flowise texto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://flowise.trecofantastico.com.br/api/v1/prediction/7c7bec4e-4fcf-4843-af5f-10c7ce19f6ad",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"question\": \"{{ $('OpenAIAudio').item.json[\"text\"].replace(/[^a-zA-Z0-9 ]/g, '').replace(/\\s+/g, ' ').trim() }}. Responda em português.\",\n  \"overrideConfig\": {\n    \"sessionId\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "cd23fa55-fe32-4a61-b7e1-f427533d5ce4",
+      "name": "Envia ao Flowise Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1240,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://apichatwootdocker.trecofantastico.com.br/message/sendText/vvvv",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "9d59f70f765ca883eff0f4e7fb3b6272"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\",\n        \"linkPreview\": false\n    },\n    \"textMessage\": {\n        \"text\": \"{{ $('Envia ao Flowise Audio').item.json[\"text\"].replace(/\\n/g, \"\\\\n\") }}\"\n    }\n}",
+        "options": {}
+      },
+      "id": "49c7c682-f68f-4de8-a96d-2f974a00d036",
+      "name": "Responde audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://apichatwootdocker.trecofantastico.com.br/message/sendText/vvvv",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "9d59f70f765ca883eff0f4e7fb3b6272"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\",\n        \"linkPreview\": false\n    },\n    \"textMessage\": {\n        \"text\": \"{{ $('Envia ao Flowise texto').item.json[\"text\"].replace(/\\n/g, \"\\\\n\") }}\"\n    }\n}",
+        "options": {}
+      },
+      "id": "3e989f49-5781-4ff6-b99e-25373bf45f66",
+      "name": "Responde texto",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://flowise.trecofantastico.com.br/api/v1/prediction/7c7bec4e-4fcf-4843-af5f-10c7ce19f6ad",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"question\": \"{{ $('OpenAIImagem').item.json[\"content\"].replace(/[^a-zA-Z0-9 ]/g, '').replace(/\\s+/g, ' ').trim() }}. Responda em português.\",\n  \"overrideConfig\": {\n    \"sessionId\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "be81f574-6807-41af-8f09-a1a8a54c11a1",
+      "name": "Envia ao Flowise Imagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://apichatwootdocker.trecofantastico.com.br/message/sendText/vvvv",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "9d59f70f765ca883eff0f4e7fb3b6272"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\",\n        \"linkPreview\": false\n    },\n    \"textMessage\": {\n        \"text\": \"{{ $('Envia ao Flowise Imagem').item.json[\"text\"].replace(/\\n/g, \"\\\\n\") }}\"\n    }\n}",
+        "options": {}
+      },
+      "id": "e5d7b7c8-3516-49c2-b114-8859a569c339",
+      "name": "Responde Imagem",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://flowise.trecofantastico.com.br/api/v1/prediction/7c7bec4e-4fcf-4843-af5f-10c7ce19f6ad",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"question\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"message\"][\"imageMessage\"][\"caption\"] }},{{ $('OpenAIImagem').item.json[\"content\"].replace(/[^a-zA-Z0-9 ]/g, '').replace(/\\s+/g, ' ').trim() }}. Responda em português.\",\n  \"overrideConfig\": {\n    \"sessionId\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "af25eca8-7ba0-4bc1-8fcf-c8e67b70bd59",
+      "name": "Envia ao Flowise Imagem + Legenda",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1440,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://apichatwootdocker.trecofantastico.com.br/message/sendText/vvvv",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "9d59f70f765ca883eff0f4e7fb3b6272"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"number\": \"{{ $('Webhook').item.json[\"body\"][\"data\"][\"key\"][\"remoteJid\"] }}\",\n    \"options\": {\n        \"delay\": 1200,\n        \"presence\": \"composing\",\n        \"linkPreview\": false\n    },\n    \"textMessage\": {\n        \"text\": \"{{ $('Envia ao Flowise Imagem + Legenda').item.json[\"text\"].replace(/\\n/g, \"\\\\n\") }}\"\n    }\n}",
+        "options": {}
+      },
+      "id": "78d83266-205a-4ab1-bb95-5a8d6c3b4723",
+      "name": "Responde Imagem + legenda",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1640,
+        740
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "ade56c50-1520-4760-8df5-e99617d6d3ad",
+              "leftValue": "={{ $('Webhook').item.json[\"body\"][\"data\"][\"message\"][\"imageMessage\"][\"caption\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2387f504-89db-42d0-99fc-13859169fd29",
+      "name": "If",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1220,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": ":MyValue",
+        "options": {}
+      },
+      "id": "e2e6a444-1c91-4f41-bb0b-3fedcf7e9892",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        460,
+        360
+      ],
+      "webhookId": "4df1b5b8-87b3-47af-b687-f3fb81c5c9a1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "52aaf749-fe4f-44e4-880e-15b2bfc027f1",
+                    "leftValue": "={{ $('Webhook').item.json[\"body\"][\"data\"][\"messageType\"] }}",
+                    "rightValue": "extendedTextMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json[\"body\"][\"data\"][\"messageType\"] }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "c0e434dd-1268-421d-b81b-3a5e90ed9550",
+                    "leftValue": "={{ $('Webhook').item.json[\"body\"][\"data\"][\"messageType\"] }}",
+                    "rightValue": "imageMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "06668c7f-4d7e-491a-a8c6-f3197fa257bd",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        640,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "id": "0c00cc32-6437-40ae-9c60-d4d7a2ee151b",
+      "name": "OpenAIAudio",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        360
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OubSFnSx9ahX7Uei",
+          "name": "MinhaAPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "text": "Descreva todo o conteudo da imagem. Responda sem acento, sem hifens",
+        "inputType": "base64",
+        "binaryPropertyName": "data2",
+        "options": {}
+      },
+      "id": "4fcbaa4e-9cb4-4379-b529-1120885c0bef",
+      "name": "OpenAIImagem",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        540
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "OubSFnSx9ahX7Uei",
+          "name": "MinhaAPI"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Converte Imagem": {
+      "main": [
+        [
+          {
+            "node": "OpenAIImagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converte Audio": {
+      "main": [
+        [
+          {
+            "node": "OpenAIAudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia ao Flowise texto": {
+      "main": [
+        [
+          {
+            "node": "Responde texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia ao Flowise Audio": {
+      "main": [
+        [
+          {
+            "node": "Responde audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia ao Flowise Imagem": {
+      "main": [
+        [
+          {
+            "node": "Responde Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia ao Flowise Imagem + Legenda": {
+      "main": [
+        [
+          {
+            "node": "Responde Imagem + legenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Envia ao Flowise Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Envia ao Flowise Imagem + Legenda",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Envia ao Flowise texto",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Converte Audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Converte Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAIAudio": {
+      "main": [
+        [
+          {
+            "node": "Envia ao Flowise Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAIImagem": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb601e8d-96a3-49be-b603-53d7722eef57",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "33738330930e3881dd5571eca013f36ddf8aab20e4ea5c1f2ebaf4a2b4668ac6"
+  },
+  "id": "0idmhtRM2geVuity",
+  "tags": []
+}
