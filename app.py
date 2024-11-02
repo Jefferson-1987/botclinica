@@ -18,7 +18,6 @@ server = app.server  # O server Flask subjacente
 # Registra o Blueprint da API no servidor Flask
 server.register_blueprint(api_blueprint, url_prefix='/api')
 
-
 # Escopos para acesso à Google Agenda
 app.layout = html.Div([
     html.H1("Formulário de Serviço"),
