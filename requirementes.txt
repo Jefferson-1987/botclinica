@@ -1,0 +1,9 @@
+google-api-python-client
+google-auth-httplib2 
+google-auth-oauthlib
+dash_bootstrap_components
+dash
+flask
+pytz
+python-dotenv==1.0.1
+openai==1.41.0
