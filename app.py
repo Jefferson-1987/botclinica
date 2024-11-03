@@ -51,7 +51,6 @@ app.layout = html.Div([
     # Área para exibir a saída
     html.Div(id='output-div', style={'marginTop': 20})
 ])
-
 # Callback para atualizar o conteúdo do dashboard após submissão
 @app.callback(
     Output('output-div', 'children'),
